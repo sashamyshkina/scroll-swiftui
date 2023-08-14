@@ -1,8 +1,8 @@
 //
-//  ContentView3.swift
+//  ContentView3_iOS14.swift
 //  swiftUI_scrollView
 //
-//  Created by Sasha Myshkina on 07/08/2023.
+//  Created by Sasha Myshkina on 14/08/2023.
 //
 
 import SwiftUI
@@ -10,7 +10,7 @@ import SwiftUI
 // This view showcases vertical scroll with
 // .scrollPosition(id:) modifier
 
-struct ContentView3: View {
+struct ContentView3_iOS14: View {
     
     // MARK: - Declarations
     
@@ -26,25 +26,25 @@ struct ContentView3: View {
     
     @StateObject var viewModel = ScrollViewContentModel()
     
-    @State private var scrollPosition: Int? = 0
+    @State var currentId: Int = 0
     
     // MARK: - Body
     
     var body: some View {
         VStack(spacing: Constant.vstackSpacing) {
-            buttonView
-            
-            ScrollView(.vertical) {
-                LazyVStack {
-                    ForEach(viewModel.contentItems) { item in
-                        rectangleView(colour: item.colour, text: "\(item.id)")
-                            .containerRelativeFrame([.vertical, .horizontal])
+            ScrollViewReader { proxy in
+                buttonView(with: proxy)
+                ScrollView(.vertical) {
+                    LazyVStack {
+                        ForEach(viewModel.contentItems) { item in
+                            rectangleView(colour: item.colour, text: "\(item.id)")
+                                .containerRelativeFrame([.vertical, .horizontal])
+                                .id(item.id)
+                        }
                     }
                 }
-                .scrollTargetLayout()
+                .safeAreaPadding(.horizontal, Constant.safeAreaPadding)
             }
-            .scrollPosition(id: $scrollPosition)
-            .safeAreaPadding(.horizontal, Constant.safeAreaPadding)
         }
         .safeAreaPadding(.bottom, Constant.safeAreaPadding)
     }
@@ -57,31 +57,33 @@ struct ContentView3: View {
             }
     }
     
-    private var buttonView: some View {
+    private func buttonView(with proxy: ScrollViewProxy) -> some View {
         ZStack {
             Color.black
             HStack {
-                buttonTop
+                topButton(with: proxy)
                 VStack {
                     Button("Next page") {
-                        scrollPosition = scrollPosition == nil ? 0 : (scrollPosition! + 1)
+                        if currentId < viewModel.contentItems.count - 1 {
+                            proxy.scrollTo(currentId + 1)
+                            currentId = currentId + 1
+                        }
                     }
                     .padding(5)
                     
-                    if let position = scrollPosition {
-                        Text("Current page: \(position)")
-                            .foregroundColor(.white)
-                    }
+                    Text("Current page: \(currentId)")
+                        .foregroundColor(.white)
                 }
-                buttonBottom
+                bottomButton(with: proxy)
             }
         }
         .frame(height: Constant.buttonViewHeight)
     }
     
-    private var buttonTop: some View {
+    private func topButton(with proxy: ScrollViewProxy) -> some View {
         Button(action: {
-            scrollPosition = 0
+            proxy.scrollTo(0)
+            currentId = 0
         }, label: {
             Image(systemName: "arrow.up")
                 .foregroundColor(.white)
@@ -89,9 +91,11 @@ struct ContentView3: View {
         .padding(.horizontal, Constant.safeAreaPadding)
     }
     
-    private var buttonBottom: some View {
+    private func bottomButton(with proxy: ScrollViewProxy) -> some View {
         Button(action: {
-            scrollPosition = viewModel.contentItems.count - 1
+            let lastItemId = viewModel.contentItems.count - 1
+            proxy.scrollTo(lastItemId)
+            currentId = lastItemId
         }, label: {
             Image(systemName: "arrow.down")
                 .foregroundColor(.white)
@@ -100,8 +104,8 @@ struct ContentView3: View {
     }
 }
 
-struct ContentView3_Previews: PreviewProvider {
+struct ContentView3_iOS14_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView3()
+        ContentView3_iOS14()
     }
 }

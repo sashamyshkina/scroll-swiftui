@@ -11,7 +11,7 @@ import SwiftUI
 struct swiftUI_scrollViewApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView1()
+            ContentView3_iOS14()
         }
     }
 }
