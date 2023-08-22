@@ -8,7 +8,7 @@
 import SwiftUI
 
 // This view showcases vertical scroll with
-// .scrollPosition(id:) modifier
+// ScrollViewReader to scroll programatically to the top, to the bottom, and to a single view inside the ScrollView content
 
 struct ContentView3_iOS14: View {
     
@@ -43,6 +43,10 @@ struct ContentView3_iOS14: View {
                         }
                     }
                 }
+                // as this example targets only auto scrolling,
+                // manual scrolling is disable. To observe manual scrolling positions,
+                // use ScrollView + PreferenceKey
+                .scrollDisabled(true)
                 .safeAreaPadding(.horizontal, Constant.safeAreaPadding)
             }
         }
